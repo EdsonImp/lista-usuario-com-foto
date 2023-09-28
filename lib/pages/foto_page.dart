@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:gallery_saver/gallery_saver.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-
-import 'package:path_provider/path_provider.dart';
-
+import 'package:lista_usuario_com_foto/pages/lista_user.dart';
 
 
 class FotoPage extends StatefulWidget {
@@ -13,33 +13,32 @@ class FotoPage extends StatefulWidget {
 
 class _FotoPageState extends State<FotoPage> {
   File? _image;
+  ListaUsuarios user = ListaUsuarios();
 
-  Future<void> _tirarFoto(ImageSource source) async {
+
+   Future<void> _tirarFoto( ImageSource source) async {
     final ImagePicker picker = ImagePicker();
     final image = await picker.pickImage(source: source);
-    print("1 ${image?.path.toString()}");
-
-    if (image != null) {
-
-      setState(() {
-        _image = File(image.path);
-      });
-
-      //salvar permanentemente
-      final directory = await getApplicationDocumentsDirectory();
-      final newPath = '${directory.path}/foto.png';
-      print(newPath);
-      await _image!.copy(newPath);
-
+       if (image != null) {
+         File? croppedFile = await ImageCropper().cropImage(
+           sourcePath: image.path,
+           aspectRatioPresets: [CropAspectRatioPreset.square],
+           androidUiSettings: const AndroidUiSettings(
+             toolbarTitle: 'Cropper',
+             toolbarColor: Colors.deepOrange,
+             toolbarWidgetColor: Colors.white,
+             initAspectRatio: CropAspectRatioPreset.original,
+             lockAspectRatio: false,
+           ),
+         );
+         GallerySaver.saveImage(croppedFile!.path, albumName: 'appFlutterUser');
+         Navigator.pop(context, croppedFile!.path);
+       //setState(() {
+       //_image = croppedFile;
+      // });
     }
-  }
-  Future<void> _loadImage() async {
-    final directory = await getApplicationDocumentsDirectory();
-    final newPath = '${directory.path}/foto.png';
-    setState(() {
-      _image = File(newPath);
-    });
-  }
+
+     }
 
   @override
   Widget build(BuildContext context) {
@@ -54,8 +53,9 @@ class _FotoPageState extends State<FotoPage> {
             _image != null
                 ? Image.file(
               _image!,
-              height: 250,
-              width: 250,
+                 width: 170,
+                 height: 170,
+
             )
                 : const Text('Nenhuma foto selecionada'),
             ElevatedButton(
@@ -66,10 +66,7 @@ class _FotoPageState extends State<FotoPage> {
               onPressed: () => _tirarFoto(ImageSource.gallery),
               child: const Text('Escolher da Galeria'),
             ),
-            ElevatedButton(
-              onPressed: () => _loadImage(),
-              child: const Text('pega foto'),
-            ),
+
           ],
         ),
       ),

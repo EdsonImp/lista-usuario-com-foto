@@ -9,7 +9,7 @@ class UserRepository  {
 
   Future<http.Response> salvaUsuario(Usuario usuario) async{
     return await http.post(
-        Uri.parse('https://parseapi.back4app.com/classes/endereco'),
+        Uri.parse('https://parseapi.back4app.com/classes/usuarios'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'X-Parse-Application-Id': 'KTrYFVO3Ur8j0zyNhfNJI7zLDuJLhtGHJpZVvZYB',
@@ -25,7 +25,24 @@ class UserRepository  {
     );
 
   }
+  Future<http.Response> atualizaFotoUsuario(String id, String path) async{
+    return await http.put(
+        Uri.parse('https://parseapi.back4app.com/classes/usuarios/$id'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'X-Parse-Application-Id': 'KTrYFVO3Ur8j0zyNhfNJI7zLDuJLhtGHJpZVvZYB',
+          'X-Parse-REST-API-Key': 'n8NOOta9bmlDUoJ1LGQjp17R9F35TEneWiZoGVHS'
+        },
+        body: jsonEncode(<String, dynamic>{
+         // 'nome': usuario.nome,
+          'imageurl': path,
+          //'email': usuario.email,
 
+        })
+
+    );
+
+  }
 
   Future<List<dynamic>> carregarUsuarios() async {
       final response = await http.get(
