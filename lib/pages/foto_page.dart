@@ -24,7 +24,7 @@ class _FotoPageState extends State<FotoPage> {
            sourcePath: image.path,
            aspectRatioPresets: [CropAspectRatioPreset.square],
            androidUiSettings: const AndroidUiSettings(
-             toolbarTitle: 'Cropper',
+             toolbarTitle: 'Ajustar imagem',
              toolbarColor: Colors.deepOrange,
              toolbarWidgetColor: Colors.white,
              initAspectRatio: CropAspectRatioPreset.original,

@@ -44,6 +44,19 @@ class UserRepository  {
 
   }
 
+  Future<http.Response> deletaUsuario(String id) async{
+    return await http.delete(
+        Uri.parse('https://parseapi.back4app.com/classes/usuarios/$id'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'X-Parse-Application-Id': 'KTrYFVO3Ur8j0zyNhfNJI7zLDuJLhtGHJpZVvZYB',
+          'X-Parse-REST-API-Key': 'n8NOOta9bmlDUoJ1LGQjp17R9F35TEneWiZoGVHS'
+        },
+
+    );
+
+  }
+
   Future<List<dynamic>> carregarUsuarios() async {
       final response = await http.get(
       Uri.parse('https://parseapi.back4app.com/classes/usuarios'),

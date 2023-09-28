@@ -17,8 +17,7 @@ class _ListaUsuariosState extends State<ListaUsuarios> {
   final TextEditingController _nomeController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   var users = [];
-  var avatar;
-
+  var pathImage;
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -32,11 +31,12 @@ class _ListaUsuariosState extends State<ListaUsuarios> {
       _formKey.currentState!.save();
       Usuario usuario = Usuario(nome: _nome, imageUrl: "", email: _email);
       repository.salvaUsuario(usuario);
-      _nomeController.clear();
-      _emailController.clear();
       setState(() {
         pegarLista();
       });
+      _nomeController.clear();
+      _emailController.clear();
+
     }
   }
 
@@ -128,7 +128,7 @@ class _ListaUsuariosState extends State<ListaUsuarios> {
                                     },
                                     child: const Text('Voltar'),
                                   ),
-                                  SizedBox(width: 10),
+                                  const SizedBox(width: 10),
                                   ElevatedButton(
                                     onPressed: () {
                                       _submitForm();
@@ -148,14 +148,32 @@ class _ListaUsuariosState extends State<ListaUsuarios> {
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: ListView.builder(
+            child:users.isEmpty
+                ? const Center(
+              child: CircularProgressIndicator(),
+            ) :
+
+            ListView.builder(
                 itemCount: users.length,
                 itemBuilder: (BuildContext context, int index) {
                   if (users[index]['imageurl'] != "") {
                     final newPath = users[index]['imageurl'];
-                    avatar = newPath;
+                    pathImage = newPath;
+
                   }
-                  return Card(
+                  return  Dismissible(
+                      key: UniqueKey(),
+                  onDismissed: (DismissDirection dismissDirection) async {
+                   await repository.deletaUsuario(users[index]['objectId'].toString());
+                   setState(() {
+                     pegarLista();
+                   });
+
+                  },
+                  background: Container(color:Colors.red),
+
+
+                   child: Card(
                       child: ListTile(
                           title: Text(users[index]['nome']),
                           subtitle: Text(users[index]['email']),
@@ -176,11 +194,21 @@ class _ListaUsuariosState extends State<ListaUsuarios> {
                                     _idUser = users[index]['objectId'];
                                     _navigateToFotoPage();
                                   },
-                                  child: CircleAvatar(
-                                    radius: 50,
-                                    backgroundImage: FileImage(File(avatar)),
+                                  child: Container(
+                                    width: 60.0,
+                                    height: 60.0,
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        image: DecorationImage(
+                                            fit: BoxFit.fill,
+                                            image: FileImage(File(pathImage))
+                                                )
+                                        )
+                                    ),
+                                  )
                                   ),
-                                )));
+                                )
+                  );
                 }),
           ),
         ));
